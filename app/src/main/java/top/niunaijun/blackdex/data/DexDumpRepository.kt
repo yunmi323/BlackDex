@@ -12,6 +12,9 @@ import top.niunaijun.blackbox.BlackBoxCore.getPackageManager
 import top.niunaijun.blackbox.BlackDexCore
 import top.niunaijun.blackbox.utils.AbiUtils
 import top.niunaijun.blackbox.utils.FileUtils
+import top.niunaijun.blackdex.app.App
+import top.niunaijun.blackdex.app.AppManager
+import top.niunaijun.blackdex.app.BlackDexLoader
 import top.niunaijun.blackdex.data.entity.AppInfo
 import top.niunaijun.blackdex.data.entity.DumpInfo
 import java.io.File
@@ -29,7 +32,7 @@ class DexDumpRepository {
     fun getAppList(mAppListLiveData: MutableLiveData<List<AppInfo>>) {
 
         val installedApplications: List<ApplicationInfo> =
-            getPackageManager().getInstalledApplications(0)
+                getPackageManager().getInstalledApplications(0)
         val installedList = mutableListOf<AppInfo>()
 
         for (installedApplication in installedApplications) {
@@ -41,9 +44,9 @@ class DexDumpRepository {
 
 
             val info = AppInfo(
-                installedApplication.loadLabel(getPackageManager()).toString(),
-                installedApplication.packageName,
-                installedApplication.loadIcon(getPackageManager())
+                    installedApplication.loadLabel(getPackageManager()).toString(),
+                    installedApplication.packageName,
+                    installedApplication.loadIcon(getPackageManager())
             )
             installedList.add(info)
         }
@@ -80,12 +83,17 @@ class DexDumpRepository {
     private fun startCountdown(dexDumpLiveData: MutableLiveData<DumpInfo>) {
         GlobalScope.launch {
             val tempId = dumpTaskId
-            delay(10000)
-
+            while (BlackDexCore.get().isRunning) {
+                delay(10000)
+                //10s
+                if (!AppManager.mBlackBoxLoader.isFixCodeItem()) {
+                    break
+                }
+                //fixCodeItem 需要长时间运行，普通内存dump不需要
+            }
             if (tempId == dumpTaskId) {
                 dexDumpLiveData.postValue(DumpInfo(DumpInfo.TIMEOUT))
             }
         }
-
     }
 }
