@@ -99,13 +99,13 @@ public class BlackBoxCore extends ClientConfiguration {
 //            android.os.Debug.waitForDebugger();
         }
         if (isServerProcess()) {
-            Intent intent = new Intent();
-            intent.setClass(getContext(), DaemonService.class);
-            if (BuildCompat.isOreo()) {
-                getContext().startForegroundService(intent);
-            } else {
-                getContext().startService(intent);
-            }
+//            Intent intent = new Intent();
+//            intent.setClass(getContext(), DaemonService.class);
+//            if (BuildCompat.isOreo()) {
+//                getContext().startForegroundService(intent);
+//            } else {
+//                getContext().startService(intent);
+//            }
         }
         HookManager.get().init();
     }
@@ -241,6 +241,11 @@ public class BlackBoxCore extends ClientConfiguration {
     @Override
     public boolean isFixCodeItem() {
         return mClientConfiguration.isFixCodeItem();
+    }
+
+    @Override
+    public boolean isEnableHookDump() {
+        return mClientConfiguration.isEnableHookDump();
     }
 
     private void startLogcat() {
